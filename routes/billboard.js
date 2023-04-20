@@ -1,6 +1,7 @@
 const router = require("express").Router();
 
 const billboard = require("../models/Billboard")
+const user = require("../models/User")
 const logger = require("../config/logger");
 const { verifyToken, verifyTokenAndAuthorization, verifyTokenAndAdmin } = require("./verifyToken");
 
@@ -86,13 +87,13 @@ router.get("/find/:billboard_id", verifyToken, async (request, response) => {
 
 // GET ALL FORMS
 router.get("/", verifyToken, async (request, response) => {
-    isRegulator = request.user.isRegulator;
     const query = request.query.new;
     try {
-        if(isRegulator){
+        const User = await user.findOne({user_id: request.user.id});
+        if(User.isRegulator){
             const billboards = query
-                ? await billboard.findAll({governing_body: request.user.user_name}).sort({ billboard_id: -1 }).limit(100)
-                : await billboard.find({governing_body: request.user.user_name});
+                ? await billboard.findAll({governing_body: User.user_name}).sort({ billboard_id: -1 }).limit(100)
+                : await billboard.find({governing_body: User.user_name});
             logger.info("Billboards details sent to: " + request.user.id);
             response.status(200).json(billboards);
         }else {
