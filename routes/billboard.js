@@ -91,8 +91,8 @@ router.get("/", verifyToken, async (request, response) => {
     try {
         if(isRegulator){
             const billboards = query
-                ? await billboard.findAll({governing_body: request.user.name}).sort({ billboard_id: -1 }).limit(100)
-                : await billboard.find({governing_body: request.user.name});
+                ? await billboard.findAll({governing_body: request.user.user_name}).sort({ billboard_id: -1 }).limit(100)
+                : await billboard.find({governing_body: request.user.user_name});
             logger.info("Billboards details sent to: " + request.user.id);
             response.status(200).json(billboards);
         }else {
